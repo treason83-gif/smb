@@ -84,11 +84,11 @@
 
     .filters {
       display: grid;
-      grid-template-columns: 1.4fr 1fr 1fr 0.7fr;
+      grid-template-columns: 1.4fr 1fr 1fr 1fr 0.7fr;
       gap: 12px;
       align-items: flex-end;
     }
-
+    
     @media (max-width: 900px) {
       .filters {
         grid-template-columns: 1fr 1fr;
@@ -340,37 +340,45 @@
 
     <section class="panel">
       <div class="filters">
-        <div class="field">
-          <label for="searchInput">Search by name</label>
-          <input
-            id="searchInput"
-            class="field-input"
-            type="text"
-            placeholder="Start typing a business name..."
-          />
-        </div>
+       <div class="field">
+  <label for="searchInput">Search by name</label>
+  <input
+    id="searchInput"
+    class="field-input"
+    type="text"
+    placeholder="Start typing a business name..."
+  />
+</div>
 
-        <div class="field">
-          <label for="categoryFilter">Category</label>
-          <select id="categoryFilter" class="field-input">
-            <option value="">All categories</option>
-          </select>
-        </div>
+<div class="field">
+  <label for="categoryFilter">Category</label>
+  <select id="categoryFilter" class="field-input">
+    <option value="">All categories</option>
+  </select>
+</div>
 
-        <div class="field">
-          <label for="employeesFilter"># of Employees</label>
-          <select id="employeesFilter" class="field-input">
-            <option value="">All sizes</option>
-          </select>
-        </div>
+<div class="field">
+  <label for="neighborhoodFilter">Neighborhood</label>
+  <select id="neighborhoodFilter" class="field-input">
+    <option value="">All neighborhoods</option>
+  </select>
+</div>
 
-        <div class="field">
-          <label>&nbsp;</label>
-          <button id="resetBtn" class="btn" type="button">
-            <span class="btn-icon"></span>
-            Reset filters
-          </button>
-        </div>
+<div class="field">
+  <label for="employeesFilter"># of Employees</label>
+  <select id="employeesFilter" class="field-input">
+    <option value="">All sizes</option>
+  </select>
+</div>
+
+<div class="field">
+  <label>&nbsp;</label>
+  <button id="resetBtn" class="btn" type="button">
+    <span class="btn-icon"></span>
+    Reset filters
+  </button>
+</div>
+
       </div>
 
       <div class="meta-row">
@@ -411,61 +419,81 @@
     }
 
     function initFilters() {
-      const categorySelect = document.getElementById("categoryFilter");
-      const employeesSelect = document.getElementById("employeesFilter");
+  const categorySelect = document.getElementById("categoryFilter");
+  const neighborhoodSelect = document.getElementById("neighborhoodFilter");
+  const employeesSelect = document.getElementById("employeesFilter");
 
-      const categories = Array.from(
-        new Set(allBusinesses.map(b => b.category).filter(Boolean))
-      ).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+  // Categories
+  const categories = Array.from(
+    new Set(allBusinesses.map(b => b.category).filter(Boolean))
+  ).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
 
-      categories.forEach(cat => {
-        const opt = document.createElement("option");
-        opt.value = cat;
-        opt.textContent = cat;
-        categorySelect.appendChild(opt);
-      });
+  categories.forEach(cat => {
+    const opt = document.createElement("option");
+    opt.value = cat;
+    opt.textContent = cat;
+    categorySelect.appendChild(opt);
+  });
 
-      const employeeValues = Array.from(
-        new Set(
-          allBusinesses
-            .map(b => b.employees)
-            .filter(v => v && String(v).trim() !== "")
-        )
-      ).sort((a, b) =>
-        String(a).localeCompare(String(b), undefined, { sensitivity: "base" })
-      );
+  // Neighborhoods
+  const neighborhoods = Array.from(
+    new Set(allBusinesses.map(b => b.neighborhood).filter(Boolean))
+  ).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
 
-      employeeValues.forEach(val => {
-        const opt = document.createElement("option");
-        opt.value = val;
-        opt.textContent = val;
-        employeesSelect.appendChild(opt);
-      });
-    }
+  neighborhoods.forEach(nh => {
+    const opt = document.createElement("option");
+    opt.value = nh;
+    opt.textContent = nh;
+    neighborhoodSelect.appendChild(opt);
+  });
+
+  // # of Employees
+  const employeeValues = Array.from(
+    new Set(
+      allBusinesses
+        .map(b => b.employees)
+        .filter(v => v && String(v).trim() !== "")
+    )
+  ).sort((a, b) =>
+    String(a).localeCompare(String(b), undefined, { sensitivity: "base" })
+  );
+
+  employeeValues.forEach(val => {
+    const opt = document.createElement("option");
+    opt.value = val;
+    opt.textContent = val;
+    employeesSelect.appendChild(opt);
+  });
+}
+
 
     function applyFilters() {
-      const searchText = document
-        .getElementById("searchInput")
-        .value.trim()
-        .toLowerCase();
-      const category = document.getElementById("categoryFilter").value;
-      const employeesFilter = document.getElementById("employeesFilter").value;
+  const searchText = document
+    .getElementById("searchInput")
+    .value.trim()
+    .toLowerCase();
+  const category = document.getElementById("categoryFilter").value;
+  const neighborhood = document.getElementById("neighborhoodFilter").value;
+  const employeesFilter = document.getElementById("employeesFilter").value;
 
-      const filtered = allBusinesses.filter(biz => {
-        if (searchText) {
-          const haystack = (biz.name || "").toLowerCase();
-          if (!haystack.includes(searchText)) return false;
-        }
-
-        if (category && biz.category !== category) return false;
-
-        if (employeesFilter && String(biz.employees) !== employeesFilter) return false;
-
-        return true;
-      });
-
-      renderResults(filtered);
+  const filtered = allBusinesses.filter(biz => {
+    if (searchText) {
+      const haystack = (biz.name || "").toLowerCase();
+      if (!haystack.includes(searchText)) return false;
     }
+
+    if (category && biz.category !== category) return false;
+
+    if (neighborhood && biz.neighborhood !== neighborhood) return false;
+
+    if (employeesFilter && String(biz.employees) !== employeesFilter) return false;
+
+    return true;
+  });
+
+  renderResults(filtered);
+}
+
 
     function renderResults(list) {
       const resultsEl = document.getElementById("results");
@@ -566,22 +594,28 @@
     }
 
     function setupEvents() {
-      document
-        .getElementById("searchInput")
-        .addEventListener("input", applyFilters);
-      document
-        .getElementById("categoryFilter")
-        .addEventListener("change", applyFilters);
-      document
-        .getElementById("employeesFilter")
-        .addEventListener("change", applyFilters);
-      document.getElementById("resetBtn").addEventListener("click", () => {
-        document.getElementById("searchInput").value = "";
-        document.getElementById("categoryFilter").value = "";
-        document.getElementById("employeesFilter").value = "";
-        applyFilters();
-      });
-    }
+  document
+    .getElementById("searchInput")
+    .addEventListener("input", applyFilters);
+  document
+    .getElementById("categoryFilter")
+    .addEventListener("change", applyFilters);
+  document
+    .getElementById("neighborhoodFilter")
+    .addEventListener("change", applyFilters);
+  document
+    .getElementById("employeesFilter")
+    .addEventListener("change", applyFilters);
+
+  document.getElementById("resetBtn").addEventListener("click", () => {
+    document.getElementById("searchInput").value = "";
+    document.getElementById("categoryFilter").value = "";
+    document.getElementById("neighborhoodFilter").value = "";
+    document.getElementById("employeesFilter").value = "";
+    applyFilters();
+  });
+}
+
 
     async function loadData() {
       try {
